@@ -17,13 +17,14 @@ import argparse
 import datetime
 from subprocess import check_output
 from collections import OrderedDict
+from IPython import embed
 
 import pkg_resources
 __version__ = pkg_resources.require("git-bars")[0].version
 
 def print_bars(items, block=u"\u2580", width=50):
     """Print unicode bar representations of dates and scores."""
-    for i in items:
+    for i in OrderedDict(sorted(items.items(), key=lambda x: x)):
         num = str(items[i]["commits"])
 
         sys.stdout.write(i)
@@ -145,7 +146,6 @@ def main():
     args = p.parse_args()
 
     """Invoke the utility."""
-    items = []
     try:
         items = get_log(args.after, args.before, args.reverse)
     except Exception as e:
@@ -154,6 +154,7 @@ def main():
 
     filtered = filter(items, args.periodicity, args.author)
     scores = get_scores(filtered)
+
     if scores:
         print("%d commits over %d %s(s)" %
               (sum([filtered[f]["commits"] for f in filtered]),
